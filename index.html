@@ -13,6 +13,81 @@
 	<meta property="og:description" content="Play minecraft 1.8 in your browser" />
 	<meta property="og:image" content="favicon.png" />
 	<link type="image/png" rel="shortcut icon" href="favicon.png" />
+	<script type="text/javascript">
+		(function() {
+			function showFallbackButton() {
+				if(document.getElementById("br-fallback-btn")) return;
+				
+				var createBtn = function() {
+					if(document.getElementById("br-fallback-btn")) return;
+					var btn = document.createElement("button");
+					btn.id = "br-fallback-btn";
+					btn.innerText = "Erro de WASM detectado. Clique para jogar a versão JS";
+					btn.style.position = "absolute";
+					btn.style.zIndex = "100000";
+					btn.style.bottom = "20px";
+					btn.style.left = "50%";
+					btn.style.transform = "translateX(-50%)";
+					btn.style.padding = "15px 30px";
+					btn.style.fontSize = "20px";
+					btn.style.backgroundColor = "#d32f2f";
+					btn.style.color = "white";
+					btn.style.border = "2px solid white";
+					btn.style.borderRadius = "8px";
+					btn.style.cursor = "pointer";
+					btn.style.fontFamily = "sans-serif";
+					btn.style.boxShadow = "0 4px 6px rgba(0,0,0,0.3)";
+					btn.onclick = function() {
+						window.location.href = "https://ecraft.tropicaliacraft.online";
+					};
+					if(document.body) {
+						document.body.appendChild(btn);
+					} else {
+						window.addEventListener('DOMContentLoaded', function() {
+							document.body.appendChild(btn);
+						});
+					}
+				};
+
+				if(document.body) {
+					createBtn();
+				} else {
+					window.addEventListener('DOMContentLoaded', createBtn);
+				}
+			}
+
+			// Check for WebAssembly support
+			if (!window.WebAssembly) {
+				showFallbackButton();
+			}
+
+			// Listen for errors
+			window.addEventListener("error", function(e) {
+				var msg = (e.message || "").toLowerCase();
+				if(msg.indexOf("wasm") !== -1 || msg.indexOf("webassembly") !== -1) {
+					showFallbackButton();
+				}
+			});
+
+			window.addEventListener("unhandledrejection", function(e) {
+				var msg = (e.reason ? e.reason.toString() : "").toLowerCase();
+				if(msg.indexOf("wasm") !== -1 || msg.indexOf("webassembly") !== -1) {
+					showFallbackButton();
+				}
+			});
+            
+            // Hook console.error
+            var originalConsoleError = console.error;
+            console.error = function() {
+                var args = Array.from(arguments);
+                var msg = args.join(' ').toLowerCase();
+                if(msg.indexOf("wasm") !== -1 || msg.indexOf("webassembly") !== -1) {
+                    showFallbackButton();
+                }
+                originalConsoleError.apply(console, args);
+            };
+		})();
+	</script>
 	<script type="text/javascript" src="bootstrap.js"></script>
 	<script type="text/javascript">
 		"use strict";
