@@ -56,9 +56,106 @@
 				}
 			}
 
+			function showJSPIDialog() {
+				if(document.getElementById("jspi-error-modal")) return;
+
+				var createModal = function() {
+					if(document.getElementById("jspi-error-modal")) return;
+					
+					var overlay = document.createElement("div");
+					overlay.id = "jspi-error-modal";
+					overlay.style.position = "fixed";
+					overlay.style.top = "0";
+					overlay.style.left = "0";
+					overlay.style.width = "100%";
+					overlay.style.height = "100%";
+					overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
+					overlay.style.zIndex = "200000";
+					overlay.style.display = "flex";
+					overlay.style.alignItems = "center";
+					overlay.style.justifyContent = "center";
+					overlay.style.fontFamily = "sans-serif";
+
+					var box = document.createElement("div");
+					box.style.backgroundColor = "#222";
+					box.style.color = "white";
+					box.style.padding = "30px";
+					box.style.borderRadius = "10px";
+					box.style.maxWidth = "500px";
+					box.style.textAlign = "center";
+					box.style.border = "2px solid #d32f2f";
+
+					var title = document.createElement("h2");
+					title.innerText = "JSPI não está ativado";
+					title.style.marginTop = "0";
+					title.style.color = "#ff5555";
+					box.appendChild(title);
+
+					var msg = document.createElement("p");
+					msg.innerText = "O JSPI não está ativado. Você pode tentar a versão JS agora, ou fazer o tutorial para ativar o JSPI no navegador e fechar esta janela para seguir o erro do Eagtek.";
+					msg.style.lineHeight = "1.5";
+					msg.style.marginBottom = "25px";
+					box.appendChild(msg);
+
+					var btnContainer = document.createElement("div");
+					btnContainer.style.display = "flex";
+					btnContainer.style.justifyContent = "center";
+					btnContainer.style.gap = "15px";
+					btnContainer.style.flexWrap = "wrap";
+
+					var jsBtn = document.createElement("button");
+					jsBtn.innerText = "Jogar Versão JS";
+					jsBtn.style.padding = "10px 20px";
+					jsBtn.style.fontSize = "16px";
+					jsBtn.style.cursor = "pointer";
+					jsBtn.style.backgroundColor = "#4CAF50";
+					jsBtn.style.color = "white";
+					jsBtn.style.border = "none";
+					jsBtn.style.borderRadius = "5px";
+					jsBtn.onclick = function() {
+						window.location.href = "https://ecraft.tropicaliacraft.online";
+					};
+					btnContainer.appendChild(jsBtn);
+
+					var closeBtn = document.createElement("button");
+					closeBtn.innerText = "Fechar";
+					closeBtn.style.padding = "10px 20px";
+					closeBtn.style.fontSize = "16px";
+					closeBtn.style.cursor = "pointer";
+					closeBtn.style.backgroundColor = "#555";
+					closeBtn.style.color = "white";
+					closeBtn.style.border = "none";
+					closeBtn.style.borderRadius = "5px";
+					closeBtn.onclick = function() {
+						document.body.removeChild(overlay);
+					};
+					btnContainer.appendChild(closeBtn);
+
+					box.appendChild(btnContainer);
+					overlay.appendChild(box);
+
+					if(document.body) {
+						document.body.appendChild(overlay);
+					} else {
+						window.addEventListener('DOMContentLoaded', function() {
+							document.body.appendChild(overlay);
+						});
+					}
+				};
+
+				if(document.body) {
+					createModal();
+				} else {
+					window.addEventListener('DOMContentLoaded', createModal);
+				}
+			}
+
 			// Check for WebAssembly support
 			if (!window.WebAssembly) {
 				showFallbackButton();
+			} else if (typeof window.WebAssembly.Suspender === 'undefined') {
+				// Check for JSPI support (if WebAssembly exists)
+				showJSPIDialog();
 			}
 
 			// Listen for errors
