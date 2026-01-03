@@ -167,34 +167,36 @@
 			// Check for WebAssembly support
 			if (!window.WebAssembly) {
 				showFallbackButton();
-			} else if (typeof window.WebAssembly.Suspender === 'undefined') {
-				// Check for JSPI support (if WebAssembly exists)
-				showJSPIDialog();
+			}
+
+			function checkError(msg) {
+				msg = msg.toLowerCase();
+				if(msg.indexOf("wasm") !== -1 || msg.indexOf("webassembly") !== -1) {
+					if (msg.indexOf("jspi") !== -1 || msg.indexOf("suspender") !== -1 || msg.indexOf("promising") !== -1) {
+						showJSPIDialog();
+					} else {
+						showFallbackButton();
+					}
+				}
 			}
 
 			// Listen for errors
 			window.addEventListener("error", function(e) {
-				var msg = (e.message || "").toLowerCase();
-				if(msg.indexOf("wasm") !== -1 || msg.indexOf("webassembly") !== -1) {
-					showFallbackButton();
-				}
+				var msg = (e.message || "");
+				checkError(msg);
 			});
 
 			window.addEventListener("unhandledrejection", function(e) {
-				var msg = (e.reason ? e.reason.toString() : "").toLowerCase();
-				if(msg.indexOf("wasm") !== -1 || msg.indexOf("webassembly") !== -1) {
-					showFallbackButton();
-				}
+				var msg = (e.reason ? e.reason.toString() : "");
+				checkError(msg);
 			});
             
             // Hook console.error
             var originalConsoleError = console.error;
             console.error = function() {
                 var args = Array.from(arguments);
-                var msg = args.join(' ').toLowerCase();
-                if(msg.indexOf("wasm") !== -1 || msg.indexOf("webassembly") !== -1) {
-                    showFallbackButton();
-                }
+                var msg = args.join(' ');
+				checkError(msg);
                 originalConsoleError.apply(console, args);
             };
 		})();
